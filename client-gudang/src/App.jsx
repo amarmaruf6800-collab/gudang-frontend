@@ -13,7 +13,7 @@ function App() {
   // Kalau null = Mode Tambah. Kalau ada angka = Mode Edit.
   const [editId, setEditId] = useState(null);
 
-  const endpoint = "belajar-backend-nu.vercel.app/";
+  const endpoint = "https://belajar-backend-nu.vercel.app/barang";
 
   // 1. FUNGSI AMBIL DATA (Sama kayak sebelumnya)
   async function ambilData() {
