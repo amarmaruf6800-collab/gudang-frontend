@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
+import Login from "./Login";
 
 function App() {
   const [barang, setBarang] = useState([]);
+  const [sudahLogin, setSudahLogin] = useState(false);
 
   // State Form
   const [nama, setNama] = useState("");
   const [harga, setHarga] = useState("");
   const [kategori, setKategori] = useState("");
   const [stok, setStok] = useState("");
-
-  // --- STATE BARU: UNTUK MODE EDIT ---
-  // Kalau null = Mode Tambah. Kalau ada angka = Mode Edit.
   const [editId, setEditId] = useState(null);
 
   const endpoint = "https://belajar-backend-nu.vercel.app/barang";
@@ -90,8 +89,15 @@ function App() {
   }
 
   useEffect(() => {
-    ambilData();
-  }, []);
+    if (sudahLogin) {
+      ambilData();
+    }
+  }, [sudahLogin]);
+
+  //Logika Login
+  if (!sudahLogin) {
+    return <Login onLogin={setSudahLogin} />;
+  }
 
   return (
     <div
@@ -102,8 +108,27 @@ function App() {
         margin: "auto",
       }}
     >
-      <h1>Gudang React JS 🚀</h1>
-
+      {/* Tombol Logout Sederhana */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h1>Gudang React JS 🚀</h1>
+        <button
+          onClick={() => setSudahLogin(false)}
+          style={{
+            background: "red",
+            color: "white",
+            border: "none",
+            padding: "5px 10px",
+          }}
+        >
+          Logout
+        </button>
+      </div>
       {/* Form Input */}
       <div
         style={{
