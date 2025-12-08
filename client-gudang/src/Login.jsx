@@ -8,9 +8,8 @@ function Login({ onLogin }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Pastikan endpoint ini sesuai dengan backend kamu
       const response = await fetch(
-        "https://belajar-backend-nu.vercel.app/barang",
+        "https://belajar-backend-nu.vercel.app/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -22,7 +21,7 @@ function Login({ onLogin }) {
 
       if (data.success) {
         alert("Login Berhasil!");
-        onLogin(true); // Memberitahu App.jsx kalau sudah login
+        onLogin(true);
       } else {
         setError(data.pesan);
       }
@@ -35,8 +34,8 @@ function Login({ onLogin }) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>Login Admin 🔐</h2>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <h2 style={styles.cardTitle}>Login Gudang 🔑</h2>
+        {error && <p style={styles.errorMessage}>{error}</p>}
         <form onSubmit={handleLogin}>
           <input
             style={styles.input}
@@ -61,29 +60,59 @@ function Login({ onLogin }) {
   );
 }
 
-// Styling sederhana
+// Styling (CSS in JS)
 const styles = {
-  container: { display: "flex", justifyContent: "center", marginTop: "100px" },
-  card: {
+  // CONTAINER: Mengisi viewport penuh dan memusatkan konten
+  container: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: "100vh",
+    backgroundColor: "#e9ecef",
     padding: "20px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    width: "300px",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    padding: "40px",
+    borderRadius: "10px",
+    boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
+    width: "100%",
+    maxWidth: "380px",
     textAlign: "center",
+  },
+  cardTitle: {
+    color: "#343a40",
+    marginBottom: "30px",
+    fontSize: "1.8em",
   },
   input: {
     display: "block",
     width: "90%",
-    padding: "10px",
-    margin: "10px auto",
+    padding: "14px",
+    margin: "15px auto",
+    border: "1px solid #ced4da",
+    borderRadius: "5px",
+    fontSize: "1em",
+    boxSizing: "border-box",
   },
   button: {
     width: "95%",
-    padding: "10px",
-    background: "#28a745",
+    padding: "14px",
+    backgroundColor: "#28a745",
     color: "white",
     border: "none",
+    borderRadius: "5px",
     cursor: "pointer",
+    fontSize: "1.1em",
+    fontWeight: "bold",
+    marginTop: "20px",
+    transition: "background-color 0.3s",
+  },
+  errorMessage: {
+    color: "#dc3545",
+    marginBottom: "15px",
+    fontWeight: "500",
   },
 };
 

@@ -14,7 +14,7 @@ function App() {
 
   const endpoint = "https://belajar-backend-nu.vercel.app/barang";
 
-  // 1. FUNGSI AMBIL DATA (Sama kayak sebelumnya)
+  // 1. FUNGSI AMBIL DATA
   async function ambilData() {
     try {
       const response = await fetch(endpoint);
@@ -38,15 +38,12 @@ function App() {
 
     try {
       if (editId === null) {
-        // --- LOGIKA TAMBAH BARU (POST) ---
         await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataKirim),
         });
       } else {
-        // --- LOGIKA UPDATE (PUT) ---
-        // Kirim ke alamat spesifik: http://localhost:3000/barang/5
         await fetch(`${endpoint}/${editId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -54,7 +51,6 @@ function App() {
         });
       }
 
-      // Reset Form ke awal
       resetForm();
       ambilData();
     } catch (error) {
@@ -70,9 +66,9 @@ function App() {
     }
   }
 
-  // 4. FUNGSI PERSIAPAN EDIT (Mengisi form dengan data lama)
+  // 4. FUNGSI PERSIAPAN EDIT
   function aktifkanEdit(item) {
-    setEditId(item.id); // Tandai kita lagi edit ID ini
+    setEditId(item.id);
     setNama(item.nama_barang);
     setKategori(item.kategori);
     setHarga(item.harga);
@@ -94,177 +90,266 @@ function App() {
     }
   }, [sudahLogin]);
 
-  //Logika Login
   if (!sudahLogin) {
     return <Login onLogin={setSudahLogin} />;
   }
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        fontFamily: "sans-serif",
-        maxWidth: "600px",
-        margin: "auto",
-      }}
-    >
-      {/* Tombol Logout Sederhana */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1>Gudang React JS 🚀</h1>
-        <button
-          onClick={() => setSudahLogin(false)}
+    <div style={styles.pageWrapper}>
+      <div style={styles.appContainer}>
+        {/* Header dan Tombol Logout */}
+        <div style={styles.headerSection}>
+          <h1 style={{ color: "#007bff", margin: 0, fontSize: "2em" }}>
+            Gudang React JS 🚀
+          </h1>
+          <button
+            onClick={() => setSudahLogin(false)}
+            style={styles.logoutButton}
+          >
+            Logout
+          </button>
+        </div>
+
+        {/* Form Input */}
+        <div style={styles.formCard}>
+          <h3 style={styles.formTitle}>
+            {editId ? "Edit Barang" : "Tambah Barang Baru"}
+          </h3>
+
+          <form onSubmit={simpanData}>
+            <div style={styles.inputGroup}>
+              <input
+                type="text"
+                placeholder="Nama Barang"
+                value={nama}
+                onChange={(e) => setNama(e.target.value)}
+                style={styles.formInput}
+                required
+              />
+              <select
+                value={kategori}
+                onChange={(e) => setKategori(e.target.value)}
+                style={styles.formInput}
+                required
+              >
+                <option value="">Kategori</option>
+                <option value="Makanan">Makanan</option>
+                <option value="Minuman">Minuman</option>
+              </select>
+              <input
+                type="number"
+                placeholder="Harga"
+                value={harga}
+                onChange={(e) => setHarga(e.target.value)}
+                style={styles.formInput}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Stok"
+                value={stok}
+                onChange={(e) => setStok(e.target.value)}
+                style={styles.formInput}
+                required
+              />
+            </div>
+
+            <div style={styles.btnActionGroup}>
+              <button type="submit" style={styles.btnPrimary}>
+                {editId ? "UPDATE" : "SIMPAN"}
+              </button>
+
+              {editId && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  style={styles.btnSecondary}
+                >
+                  Batal
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Daftar Barang */}
+        <h2
           style={{
-            background: "red",
-            color: "white",
-            border: "none",
-            padding: "5px 10px",
+            fontSize: "1.5em",
+            color: "#343a40",
+            marginTop: "10px",
+            borderBottom: "1px solid #ddd",
+            paddingBottom: "10px",
           }}
         >
-          Logout
-        </button>
+          Daftar Barang ({barang.length})
+        </h2>
+        <ul style={styles.itemList}>
+          {barang.map((item) => (
+            <li key={item.id} style={styles.itemCard}>
+              <div style={styles.itemInfo}>
+                <strong style={{ fontSize: "1.1em", color: "#343a40" }}>
+                  {item.nama_barang}
+                </strong>{" "}
+                <br />
+                <small style={{ color: "#6c757d" }}>
+                  Rp {item.harga} | Stok: {item.stok} | Kategori: **
+                  {item.kategori}**
+                </small>
+              </div>
+              <div style={styles.actionButtons}>
+                <button
+                  onClick={() => aktifkanEdit(item)}
+                  style={styles.btnEdit}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => hapusData(item.id)}
+                  style={styles.btnDelete}
+                >
+                  Hapus
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
-      {/* Form Input */}
-      <div
-        style={{
-          background: "#f0f0f0",
-          padding: "15px",
-          borderRadius: "8px",
-          marginBottom: "20px",
-        }}
-      >
-        {/* Judul Form berubah dinamis */}
-        <h3>{editId ? "Edit Barang" : "Tambah Barang Baru"}</h3>
-
-        <form onSubmit={simpanData}>
-          <input
-            type="text"
-            placeholder="Nama Barang"
-            value={nama}
-            onChange={(e) => setNama(e.target.value)}
-            style={inputStyle}
-            required
-          />
-          <select
-            value={kategori}
-            onChange={(e) => setKategori(e.target.value)}
-            style={inputStyle}
-            required
-          >
-            <option value="">Kategori</option>
-            <option value="Makanan">Makanan</option>
-            <option value="Minuman">Minuman</option>
-          </select>
-          <input
-            type="number"
-            placeholder="Harga"
-            value={harga}
-            onChange={(e) => setHarga(e.target.value)}
-            style={inputStyle}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Stok"
-            value={stok}
-            onChange={(e) => setStok(e.target.value)}
-            style={inputStyle}
-            required
-          />
-
-          <div style={{ marginTop: "10px" }}>
-            <button type="submit" style={btnBlue}>
-              {editId ? "UPDATE" : "SIMPAN"}
-            </button>
-
-            {/* Tombol Batal hanya muncul pas lagi Edit */}
-            {editId && (
-              <button type="button" onClick={resetForm} style={btnGrey}>
-                Batal
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-
-      {/* Daftar Barang */}
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {barang.map((item) => (
-          <li key={item.id} style={cardStyle}>
-            <div>
-              <strong>{item.nama_barang}</strong> <br />
-              <small>
-                Rp {item.harga} | Stok: {item.stok} | Kategori: {item.kategori}
-              </small>
-            </div>
-            <div>
-              <button onClick={() => aktifkanEdit(item)} style={btnYellow}>
-                Edit
-              </button>
-              <button onClick={() => hapusData(item.id)} style={btnRed}>
-                Hapus
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
 
-// Styling CSS in JS biar rapi (Bonus)
-const inputStyle = {
-  padding: "8px",
-  marginRight: "5px",
-  borderRadius: "4px",
-  border: "1px solid #ccc",
-  width: "28%",
-};
-const cardStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  borderBottom: "1px solid #ddd",
-  padding: "10px 0",
-};
-const btnBlue = {
-  padding: "8px 15px",
-  background: "#007bff",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  marginRight: "5px",
-};
-const btnRed = {
-  padding: "5px 10px",
-  background: "#dc3545",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-};
-const btnYellow = {
-  padding: "5px 10px",
-  background: "#ffc107",
-  color: "black",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  marginRight: "5px",
-};
-const btnGrey = {
-  padding: "8px 15px",
-  background: "#6c757d",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
+// Styling (CSS in JS)
+const styles = {
+  // WRAPPER: Memastikan konten berada di tengah horizontal
+  pageWrapper: {
+    minHeight: "100vh",
+    backgroundColor: "#f8f9fa",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    padding: "40px 0",
+  },
+  appContainer: {
+    width: "100%",
+    maxWidth: "900px",
+    padding: "30px",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    backgroundColor: "#ffffff",
+    borderRadius: "10px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+  },
+  headerSection: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+    paddingBottom: "15px",
+    borderBottom: "3px solid #007bff",
+  },
+  logoutButton: {
+    backgroundColor: "#6c757d",
+    color: "white",
+    border: "none",
+    padding: "10px 18px",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontWeight: "600",
+    transition: "background-color 0.3s",
+  },
+  formCard: {
+    background: "#f8f9fa",
+    padding: "20px",
+    borderRadius: "8px",
+    marginBottom: "30px",
+    border: "1px solid #e9ecef",
+    boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+  },
+  formTitle: {
+    color: "#007bff",
+    borderBottom: "2px solid #007bff",
+    paddingBottom: "5px",
+    marginBottom: "15px",
+    fontSize: "1.3em",
+  },
+  inputGroup: {
+    display: "flex",
+    gap: "10px",
+    marginBottom: "10px",
+  },
+  formInput: {
+    padding: "12px",
+    borderRadius: "5px",
+    border: "1px solid #ced4da",
+    width: "25%",
+    boxSizing: "border-box",
+  },
+  btnActionGroup: {
+    marginTop: "10px",
+  },
+  itemList: {
+    listStyle: "none",
+    padding: 0,
+  },
+  itemCard: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    border: "1px solid #dee2e6",
+    borderRadius: "6px",
+    padding: "15px",
+    marginBottom: "10px",
+    boxShadow: "0 1px 5px rgba(0, 0, 0, 0.08)",
+    transition: "box-shadow 0.2s",
+  },
+  itemInfo: {
+    flexGrow: 1,
+  },
+  actionButtons: {
+    minWidth: "150px",
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  // Button Styles
+  btnPrimary: {
+    padding: "10px 20px",
+    background: "#007bff",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    marginRight: "10px",
+    fontWeight: "bold",
+  },
+  btnSecondary: {
+    padding: "10px 20px",
+    background: "#6c757d",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    fontWeight: "bold",
+  },
+  btnDelete: {
+    padding: "8px 12px",
+    background: "#dc3545",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontWeight: "500",
+    marginLeft: "8px",
+  },
+  btnEdit: {
+    padding: "8px 12px",
+    background: "#ffc107",
+    color: "black",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontWeight: "500",
+  },
 };
 
 export default App;
